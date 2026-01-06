@@ -1,0 +1,4 @@
+ERR 2026-01-06T21:33:39.019 ui.12482   tui_chdir:1761: Failed to chdir to /home/dmitriy/Documents/host-init: Неизвестная ошибка -13
+ERR 2026-01-06T21:33:52.286 ui.12490   tui_chdir:1761: Failed to chdir to /home/dmitriy/Documents/host-init: Неизвестная ошибка -13
+ERR 2026-01-06T21:35:59.361 ui.13133   tui_chdir:1761: Failed to chdir to /home/dmitriy/Documents/host-init: Неизвестная ошибка -13
+ERR 2026-01-06T21:38:19.263 ui.13538   tui_chdir:1761: Failed to chdir to /home/dmitriy/Documents/host-init: Неизвестная ошибка -13
