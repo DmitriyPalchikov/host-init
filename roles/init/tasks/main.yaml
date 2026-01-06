@@ -170,7 +170,7 @@
         executable: /bin/bash
       when: p10k_dir.stat.exists
       become_user: "{{ main_user }}"
-  when: ansible_user_id == "{{ main_user }}"
+  when: ansible_user_id == main_user
 
 - name: Copy zshrc file
   ansible.builtin.copy:
