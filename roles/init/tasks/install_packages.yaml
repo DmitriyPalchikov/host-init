@@ -31,6 +31,7 @@
     - python3-passlib
     - luarocks
     - lua
+    - fzf
   #    - kubectl
   become: true
 
