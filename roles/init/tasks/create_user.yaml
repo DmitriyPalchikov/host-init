@@ -17,6 +17,7 @@
   ansible.builtin.group:
     name: "{{ main_user }}"
     state: present
+  become: true
 
 - name: Create user "{{ main_user }}"
   ansible.builtin.user:
