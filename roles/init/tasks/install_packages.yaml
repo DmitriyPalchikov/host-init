@@ -5,10 +5,17 @@
   become: true
   when: ansible_facts["distribution"] == "Fedora"
 
-- name: Update repos
-  ansible.builtin.package:
+- name: Update repos DNF
+  ansible.builtin.dnf:
     update_cache: yes
   become: true
+  when: ansible_os_family == "RedHat"
+
+- name: Update repos APT
+  ansible.builtin.apt:
+    update_cache: yes
+  become: true
+  when: ansible_os_family == "Debian"
 
 - name: Install full packages
   ansible.builtin.package:

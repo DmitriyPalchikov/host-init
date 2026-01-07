@@ -1,4 +1,4 @@
 - name: Clone repository tmux tpm
   ansible.builtin.git:
     repo: https://github.com/tmux-plugins/tpm
-    dest: ~/.tmux/plugins/tpm
+    dest: "/home/{{ main_user }}/.tmux/plugins/tpm"
