@@ -17,7 +17,7 @@ function check_pkg_manager() {
 }
 
 function install_packages () {
-  echo "$1"
+  echo "---> $1"
   $1 update -y
   for i in "${PKG_LIST[@]}"; do
     $1 install -y "$i"
