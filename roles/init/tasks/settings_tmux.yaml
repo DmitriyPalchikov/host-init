@@ -47,3 +47,4 @@
     owner: "{{ main_user }}"
     group: "{{ main_user }}"
     recurse: true
+  become: true
