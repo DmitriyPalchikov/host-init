@@ -22,7 +22,7 @@
   args:
     executable: /bin/bash
     creates: "/home/{{ main_user }}/.oh-my-zsh"
-  become_user: "{{ main_user }}"
+  become: true
   when: downloaded_script.changed
 
 - name: Remove install-oh-my-zsh.sh
