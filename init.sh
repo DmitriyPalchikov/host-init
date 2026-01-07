@@ -8,10 +8,11 @@ PKG_MANAGER=""
 
 function check_pkg_manager() {
   for i in $1; do
-    if which "$i"; then
-      PKG_MANAGER=$i;
+    if ! which "$i"; then
+      echo " $i not in this system"
+    else
+      PKG_MANAGER=$i
     fi
-    echo "$PKG_MANAGER"
   done
 }
 
