@@ -1,226 +1,29 @@
-- name: Disable repo for Fedora
-  ansible.builtin.dnf:
-    name: fedora-cisco-openh264
-    state: absent
-  become: true
-  when: ansible_facts["distribution"] == "Fedora"
+- name: Install packages
+  include_tasks: install_packages.yaml
+  tags:
+    - packages
 
-- name: Update repos
-  ansible.builtin.package:
-    update_cache: yes
-  become: true
+- name: Install fonts
+  include_tasks: install_fonts.yaml
+  tags:
+    - fonts
 
-- name: Install full packages
-  ansible.builtin.package:
-    name: "{{ item }}"
-    state: present
-  loop:
+- name: Create user
+  include_tasks: create_user.yaml
+  tags:
+    - user
+
+- name: Install Oh-My-ZSH
+  include_tasks: install_oh_my_zsh.yaml
+  tags:
+    - oh-my-zsh
+
+- name: Install dotfiles
+  include_tasks: install_dotfiles.yaml
+  tags:
+    - dotfiles
+
+- name: Settings tmux
+  include_tasks: settings_tmux.yaml
+  tags:
     - tmux
-    - vim
-    - neovim
-    - git
-    - alacritty
-    - zsh
-    - python3-passlib
-    - luarocks
-    - lua
-  #    - kubectl
-  become: true
-
-- name: Install luacheck
-  ansible.builtin.shell:
-    cmd: luarocks install luacheck
-  become: true
-
-- name: Clone a repo eza
-  ansible.builtin.get_url:
-    url: "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz"
-    dest: /tmp/eza.tar.gz
-
-- name: Extract eza.tar.gz into /tmp
-  ansible.builtin.unarchive:
-    src: /tmp/eza.tar.gz
-    dest: /tmp
-
-- name: Copy eza into /usr/local/bin/eza
-  ansible.builtin.copy:
-    src: /tmp/eza
-    dest: /usr/local/bin/eza
-    owner: root
-    group: root
-    mode: "0755"
-  become: true
-
-- name: Check Nerd fonts in hosts
-  ansible.builtin.stat:
-    path: /usr/share/fonts/JetBrainsMono
-  register: fonts_stat
-
-- name: Fonts block
-  when: fonts_stat.stat.exists != true
-  become: true
-  block:
-    - name: Download Nerd fonts
-      ansible.builtin.get_url:
-        url: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.zip
-        dest: /tmp/JB.zip
-
-    - name: Remove dir JetBrainsMono
-      ansible.builtin.file:
-        path: /usr/share/fonts/JetBrainsMono
-        state: directory
-
-    - name: Unzip fonts
-      ansible.builtin.unarchive:
-        src: /tmp/JB.zip
-        dest: /usr/share/fonts/JetBrainsMono
-        remote_src: true
-
-    - name: Update cache fonts
-      ansible.builtin.shell:
-        cmd: fc-cache -f /usr/share/fonts
-
-    - name: Remove zip archive
-      ansible.builtin.file:
-        path: /tmp/JB.zip
-        state: absent
-
-- name: Determine admin group based on OS family
-  ansible.builtin.set_fact:
-    admin_group: >-
-      {% if ansible_os_family == "RedHat" %}
-        wheel
-      {% elif ansible_os_family == "Debian" %}
-        sudo
-      {% elif ansible_os_family == "Suse" %}
-        wheel
-      {% elif ansible_os_family == "Archlinux" %}
-        wheel
-      {% else %}
-        sudo  # fallback
-      {% endif %}
-
-- name: Create user "{{ main_user }}"
-  ansible.builtin.user:
-    name: "{{ main_user }}"
-    password: "{{ main_pass | password_hash('sha512') }}"
-    shell: /bin/zsh
-    groups: "{{ [main_user, admin_group] | join(',') }}"
-    create_home: yes
-    home: "/home/{{ main_user }}"
-    append: yes
-    generate_ssh_key: yes
-    ssh_key_bits: 2048
-    ssh_key_type: rsa
-    ssh_key_file: .ssh/id_rsa
-    update_password: on_create
-  become: true
-
-- name: Check sudoers file
-  ansible.builtin.stat:
-    path: "/etc/sudoers.d/{{ main_user }}"
-  register: sudoers_file
-  become: true
-
-- name: Create sudoers file
-  ansible.builtin.lineinfile:
-    path: /etc/sudoers.d/dmitriy
-    line: "{{ main_user }} ALL=(ALL:ALL) NOPASSWD: ALL"
-    insertafter: EOF
-    state: present
-    create: true
-  become: true
-  when: sudoers_file.stat.exists != true
-
-- name: Install Oh-my-zsh
-  shell: |
-    ZSH= sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended
-  args:
-    executable: /bin/bash
-    creates: "{{ ansible_user_dir }}/.oh-my-zsh"
-  become_user: "{{ main_user }}"
-  environment:
-    ZSH: ""
-
-- name: Clone a repo with dotfiles
-  ansible.builtin.git:
-    repo: "https://github.com/DmitriyPalchikov/dotfiles.git"
-    dest: /tmp/dotfiles
-
-- name: Install or update Powerlevel10k theme
-  block:
-    - name: Check if Powerlevel10k exists
-      stat:
-        path: "{{ ansible_user_dir }}/.oh-my-zsh/custom/themes/powerlevel10k"
-      register: p10k_dir
-      become_user: "{{ main_user }}"
-
-    - name: Clone Powerlevel10k (if not exists)
-      shell: |
-        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "{{ ansible_user_dir }}/.oh-my-zsh/custom/themes/powerlevel10k"
-      args:
-        executable: /bin/bash
-      when: not p10k_dir.stat.exists
-      become_user: "{{ main_user }}"
-
-    - name: Update Powerlevel10k (if exists)
-      shell: |
-        cd "{{ ansible_user_dir }}/.oh-my-zsh/custom/themes/powerlevel10k" && git pull --depth=1
-      args:
-        executable: /bin/bash
-      when: p10k_dir.stat.exists
-      become_user: "{{ main_user }}"
-  when: ansible_user_id == main_user
-
-- name: Copy zshrc file
-  ansible.builtin.copy:
-    src: /tmp/dotfiles/.zshrc
-    dest: "{{ ansible_user_dir }}/.zshrc"
-  become_user: "{{ main_user }}"
-
-- name: Copy tmux conf file
-  ansible.builtin.copy:
-    src: /tmp/dotfiles/.tmux.conf
-    dest: "{{ ansible_user_dir }}/.tmux.conf"
-  become_user: "{{ main_user }}"
-
-- name: Copy nvim conf files
-  ansible.builtin.copy:
-    src: /tmp/dotfiles/nvim/
-    dest: "{{ ansible_user_dir }}/.config/nvim"
-  become_user: "{{ main_user }}"
-
-- name: Copy alacritty conf file
-  ansible.builtin.copy:
-    src: /tmp/dotfiles/alacritty/
-    dest: "{{ ansible_user_dir }}/.config/alacritty"
-  become_user: "{{ main_user }}"
-
-- name: Clone repository tmux tpm
-  ansible.builtin.git:
-    repo: https://github.com/tmux-plugins/tpm
-    dest: ~/.tmux/plugins/tpm
-
-- name: Clone repository fzf-zsh-plugin
-  ansible.builtin.git:
-    repo: https://github.com/unixorn/fzf-zsh-plugin.git
-    dest: ~/.oh-my-zsh/custom/plugins/fzf-zsh-plugin
-    depth: 1
-
-- name: Touch file .fzf.zsh
-  ansible.builtin.file:
-    path: "{{ ansible_user_dir }}/.fzf/fzf.zsh"
-    owner: "{{ main_user }}"
-    group: "{{ main_user }}"
-    mode: "0644"
-    state: touch
-
-- name: Clone repository zsh-autosuggestions
-  ansible.builtin.git:
-    repo: https://github.com/zsh-users/zsh-autosuggestions.git
-    dest: ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
-
-- name: Clone repository zsh-syntax-highlighting
-  ansible.builtin.git:
-    repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
-    dest: ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting

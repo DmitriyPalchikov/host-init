@@ -1,0 +1,33 @@
+- name: Clone a repo with dotfiles
+  ansible.builtin.git:
+    repo: "https://github.com/DmitriyPalchikov/dotfiles.git"
+    dest: /tmp/dotfiles
+
+- name: Copy zshrc file
+  ansible.builtin.copy:
+    src: /tmp/dotfiles/.zshrc
+    dest: "{{ ansible_user_dir }}/.zshrc"
+  become_user: "{{ main_user }}"
+
+- name: Copy tmux conf file
+  ansible.builtin.copy:
+    src: /tmp/dotfiles/.tmux.conf
+    dest: "{{ ansible_user_dir }}/.tmux.conf"
+  become_user: "{{ main_user }}"
+
+- name: Copy nvim conf files
+  ansible.builtin.copy:
+    src: /tmp/dotfiles/nvim/
+    dest: "{{ ansible_user_dir }}/.config/nvim"
+  become_user: "{{ main_user }}"
+
+- name: Copy alacritty conf file
+  ansible.builtin.copy:
+    src: /tmp/dotfiles/alacritty/
+    dest: "{{ ansible_user_dir }}/.config/alacritty"
+  become_user: "{{ main_user }}"
+
+- name: Delete dotfiles repo
+  ansible.builtin.file:
+    src: /tmp/dotfiles
+    state: absent
