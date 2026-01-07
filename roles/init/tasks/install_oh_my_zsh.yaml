@@ -35,7 +35,7 @@
         dest: ~/.oh-my-zsh/custom/plugins/fzf-zsh-plugin
         depth: 1
 
-    - name: Touch file .fzf.zsh
+    - name: Create .fzf directiry
       ansible.builtin.file:
         path: "/home/{{ main_user }}/.fzf"
         owner: "{{ main_user }}"
