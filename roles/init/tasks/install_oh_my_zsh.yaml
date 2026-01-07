@@ -37,6 +37,15 @@
 
     - name: Touch file .fzf.zsh
       ansible.builtin.file:
+        path: "/home/{{ main_user }}/.fzf"
+        owner: "{{ main_user }}"
+        group: "{{ main_user }}"
+        mode: "0755"
+        state: directory
+      become: true
+
+    - name: Touch file .fzf.zsh
+      ansible.builtin.file:
         path: "/home/{{ main_user }}/.fzf/fzf.zsh"
         owner: "{{ main_user }}"
         group: "{{ main_user }}"
