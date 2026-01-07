@@ -19,6 +19,11 @@
   become: true
   when: downloaded_script.changed
 
+- name: Remove install-oh-my-zsh.sh
+  ansible.builtin.file:
+    path: "/home/{{ main_user }}/install-oh-my-zsh.sh"
+    state: absent
+
 - name: Clone Powerlevel10k
   ansible.builtin.git:
     repo: https://github.com/romkatv/powerlevel10k.git
