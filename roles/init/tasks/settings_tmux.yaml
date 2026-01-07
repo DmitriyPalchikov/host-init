@@ -1,3 +1,9 @@
+- name: Remove tmux dir
+  ansible.builtin.file:
+    path: "/home/{{ main_user }}/.tmux"
+    state: absent
+  become: true
+
 - name: Create tmux dirs
   ansible.builtin.file:
     path: "/home/{{ main_user }}/.tmux/plugins"
