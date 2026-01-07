@@ -4,14 +4,12 @@ set -euo pipefail
 PKG_MANAGERS=("apt" "dnf")
 PKG_LIST=("git" "ansible")
 
-PKG_MANAGER_PATH=""
 PKG_MANAGER=""
 
 function check_pkg_manager() {
   for i in $1; do
-    PKG_MANAGER_PATH=$(which "$i")
-    if [[ -z "$PKG_MANAGER_PATH" ]]; then
-      PKG_MANAGER=$PKG_MANAGER_PATH;
+    if which "$i"; then
+      PKG_MANAGER=$i;
     fi
   done
 }
