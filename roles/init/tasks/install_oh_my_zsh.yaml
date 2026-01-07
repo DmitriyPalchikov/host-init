@@ -41,6 +41,12 @@
 - name: Settings Oh-My-ZSH
   become: true
   block:
+    - name: Remove Powerlevel10k dir
+      ansible.builtin.file:
+        path: "/home/{{ main_user }}/.oh-my-zsh/custom/plugins"
+        state: absent
+      become: true
+
     - name: Clone repository fzf-zsh-plugin
       ansible.builtin.git:
         repo: https://github.com/unixorn/fzf-zsh-plugin.git
