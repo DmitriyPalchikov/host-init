@@ -3,29 +3,32 @@
     repo: "https://github.com/DmitriyPalchikov/dotfiles.git"
     dest: /tmp/dotfiles
 
-- name: Copy zshrc file
-  ansible.builtin.copy:
-    src: /tmp/dotfiles/.zshrc
-    dest: "/home/{{ main_user }}/.zshrc"
-  become_user: "{{ main_user }}"
+- name: Copy dotfiles
+  become: true
+  block:
+    - name: Copy zshrc file
+      ansible.builtin.copy:
+        src: /tmp/dotfiles/.zshrc
+        dest: "/home/{{ main_user }}/.zshrc"
+      become_user: "{{ main_user }}"
 
-- name: Copy tmux conf file
-  ansible.builtin.copy:
-    src: /tmp/dotfiles/.tmux.conf
-    dest: "/home/{{ main_user }}/.tmux.conf"
-  become_user: "{{ main_user }}"
+    - name: Copy tmux conf file
+      ansible.builtin.copy:
+        src: /tmp/dotfiles/.tmux.conf
+        dest: "/home/{{ main_user }}/.tmux.conf"
+      become_user: "{{ main_user }}"
 
-- name: Copy nvim conf files
-  ansible.builtin.copy:
-    src: /tmp/dotfiles/nvim/
-    dest: "/home/{{ main_user }}/.config/nvim"
-  become_user: "{{ main_user }}"
+    - name: Copy nvim conf files
+      ansible.builtin.copy:
+        src: /tmp/dotfiles/nvim/
+        dest: "/home/{{ main_user }}/.config/nvim"
+      become_user: "{{ main_user }}"
 
-- name: Copy alacritty conf file
-  ansible.builtin.copy:
-    src: /tmp/dotfiles/alacritty/
-    dest: "/home/{{ main_user }}/.config/alacritty"
-  become_user: "{{ main_user }}"
+    - name: Copy alacritty conf file
+      ansible.builtin.copy:
+        src: /tmp/dotfiles/alacritty/
+        dest: "/home/{{ main_user }}/.config/alacritty"
+      become_user: "{{ main_user }}"
 
 - name: Delete dotfiles repo
   ansible.builtin.file:
