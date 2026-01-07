@@ -11,11 +11,11 @@ function check_pkg_manager() {
     if which "$i"; then
       PKG_MANAGER=$i;
     fi
+    echo "$PKG_MANAGER"
   done
 }
 
-function install_packages ()
-{
+function install_packages () {
   $1 update -y
   for i in "${PKG_LIST[@]}"; do
     $1 install -y "$i"
