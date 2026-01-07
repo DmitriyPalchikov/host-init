@@ -23,6 +23,19 @@
   args:
     executable: /bin/bash
   ignore_errors: yes
+  register: command_result
+
+- name: Update tmux plugins
+  ansible.builtin.shell: |
+    su - {{ main_user }} -c "
+      cd /home/{{ main_user }}/.tmux/plugins/tpm &&
+      ./bin/update_plugins
+    "
+  become: true
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
+  when: command_result.rc != 0
 
 - name: Change owner in tmux dir {{ main_user }}
   ansible.builtin.file:
