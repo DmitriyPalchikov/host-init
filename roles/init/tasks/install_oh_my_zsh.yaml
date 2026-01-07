@@ -28,6 +28,7 @@
   ansible.builtin.file:
     path: "/home/{{ main_user }}/.oh-my-zsh/custom/themes/powerlevel10k"
     state: absent
+  become: true
 
 - name: Clone Powerlevel10k
   ansible.builtin.git:
