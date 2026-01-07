@@ -2,4 +2,5 @@
   ansible.builtin.git:
     repo: https://github.com/tmux-plugins/tpm
     dest: "/home/{{ main_user }}/.tmux/plugins/tpm"
+    executable: "/home/{{ main_user }}/.tmux/plugins/tpm/bin/install_plugins"
   become: true
