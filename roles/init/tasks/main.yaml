@@ -29,4 +29,4 @@
     - tmux
 
 - name: End of initialization
-  include_tasks:
+  include_tasks: end_of_initialization.yaml
