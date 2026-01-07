@@ -23,3 +23,11 @@
   args:
     executable: /bin/bash
   ignore_errors: yes
+
+- name: Change owner in tmux dir {{ main_user }}
+  ansible.builtin.file:
+    path: "/home/{{ main_user }}/.tmux"
+    owner: "{{ main_user }}"
+    group: "{{ main_user }}"
+    recurse: yes
+    state: directory
