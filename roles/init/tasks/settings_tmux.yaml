@@ -56,3 +56,4 @@
     group: "{{ main_user }}"
   loop: "{{ folder_contents_tmux.files }}"
   become: true
+  no_log: yes

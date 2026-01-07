@@ -1,3 +1,9 @@
+- name: Remove Powerlevel10k dir
+  ansible.builtin.file:
+    path: "/home/{{ main_user }}/.oh-my-zsh"
+    state: absent
+  become: true
+
 - name: Download Oh-my-zsh installer
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
@@ -24,12 +30,6 @@
     path: "/home/{{ main_user }}/install-oh-my-zsh.sh"
     state: absent
 
-- name: Remove Powerlevel10k dir
-  ansible.builtin.file:
-    path: "/home/{{ main_user }}/.oh-my-zsh/custom/themes/powerlevel10k"
-    state: absent
-  become: true
-
 - name: Clone Powerlevel10k
   ansible.builtin.git:
     repo: https://github.com/romkatv/powerlevel10k.git
@@ -41,12 +41,6 @@
 - name: Settings Oh-My-ZSH
   become: true
   block:
-    - name: Remove Powerlevel10k dir
-      ansible.builtin.file:
-        path: "/home/{{ main_user }}/.oh-my-zsh/custom/plugins"
-        state: absent
-      become: true
-
     - name: Clone repository fzf-zsh-plugin
       ansible.builtin.git:
         repo: https://github.com/unixorn/fzf-zsh-plugin.git
