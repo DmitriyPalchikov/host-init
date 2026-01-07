@@ -11,7 +11,7 @@
   ansible.builtin.git:
     repo: https://github.com/tmux-plugins/tpm
     dest: "/home/{{ main_user }}/.tmux/plugins/tpm"
-  become: true
+  become_user: "{{ main_user }}"
 
 - name: Install tmux plugins
   ansible.builtin.shell: |
@@ -19,7 +19,7 @@
       cd /home/{{ main_user }}/.tmux/plugins/tpm &&
       ./bin/install_plugins
     "
-  become: true
+  become_user: "{{ main_user }}"
   args:
     executable: /bin/bash
   ignore_errors: yes
@@ -30,7 +30,7 @@
       cd /home/{{ main_user }}/.tmux/plugins/tpm &&
       ./bin/update_plugins all
     "
-  become: true
+  become_user: "{{ main_user }}"
   args:
     executable: /bin/bash
   ignore_errors: yes
@@ -41,6 +41,7 @@
     file_type: any
     recurse: yes
   register: folder_contents_tmux
+  become_user: "{{ main_user }}"
 
 - name: Change owner .tmux
   ansible.builtin.file:
@@ -48,3 +49,4 @@
     owner: "{{ main_user }}"
     group: "{{ main_user }}"
   loop: "{{ folder_contents_tmux.files }}"
+  become_user: "{{ main_user }}"

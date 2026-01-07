@@ -5,7 +5,7 @@
     mode: '0755'
     owner: "{{ main_user }}"
     group: "{{ main_user }}"
-  become: true
+  become_user: "{{ main_user }}"
   register: downloaded_script
   changed_when: downloaded_script.changed
 
@@ -67,17 +67,17 @@
         repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
         dest: "/home/{{ main_user }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
 
-    - name: Find files in .oh-my-zsh
-      ansible.builtin.find:
-        paths: "/home/{{ main_user }}/.oh-my-zsh"
-        file_type: any
-        recurse: yes
-      register: folder_contents
-
-    - name: Change owner .oh-my-zsh
-      ansible.builtin.file:
-        path: "{{ item.path }}"
-        owner: "{{ main_user }}"
-        group: "{{ main_user }}"
-      loop: "{{ folder_contents.files }}"
-
+#    - name: Find files in .oh-my-zsh
+#      ansible.builtin.find:
+#        paths: "/home/{{ main_user }}/.oh-my-zsh"
+#        file_type: any
+#        recurse: yes
+#      register: folder_contents
+#
+#    - name: Change owner .oh-my-zsh
+#      ansible.builtin.file:
+#        path: "{{ item.path }}"
+#        owner: "{{ main_user }}"
+#        group: "{{ main_user }}"
+#      loop: "{{ folder_contents.files }}"
+#      no_log: yes
