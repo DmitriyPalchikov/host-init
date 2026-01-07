@@ -7,3 +7,4 @@
 - name: Install tmux plugins
   ansible.builtin.shell:
     cmd: "/home/{{ main_user }}/.tmux/plugins/tpm/bin/install_plugins"
+  become: true
