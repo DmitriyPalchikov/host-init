@@ -29,6 +29,7 @@
   ansible.builtin.file:
     path: "/home/{{ main_user }}/install-oh-my-zsh.sh"
     state: absent
+  become: true
 
 - name: Clone Powerlevel10k
   ansible.builtin.git:
