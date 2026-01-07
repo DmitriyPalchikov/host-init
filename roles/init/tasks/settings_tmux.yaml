@@ -5,7 +5,7 @@
     executable: "/home/{{ main_user }}/.tmux/plugins/tpm/bin/install_plugins"
   become: true
   environment:
-    - "TMUX_PLUGIN_MANAGER_PATH=/home/{{ main_user }}/.tmux.conf"
+    TMUX_PLUGIN_MANAGER_PATH: "/home/{{ main_user }}/.tmux.conf"
 
 #- name: Install tmux plugins
 #  ansible.builtin.shell:
