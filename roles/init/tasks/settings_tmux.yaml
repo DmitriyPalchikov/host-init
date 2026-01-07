@@ -2,9 +2,12 @@
   ansible.builtin.git:
     repo: https://github.com/tmux-plugins/tpm
     dest: "/home/{{ main_user }}/.tmux/plugins/tpm"
+    executable: "/home/{{ main_user }}/.tmux/plugins/tpm/bin/install_plugins"
   become: true
+  environment:
+    - "TMUX_PLUGIN_MANAGER_PATH=/home/{{ main_user }}/.tmux.conf"
 
-- name: Install tmux plugins
-  ansible.builtin.shell:
-    cmd: "/home/{{ main_user }}/.tmux/plugins/tpm/bin/install_plugins"
-  become: true
+#- name: Install tmux plugins
+#  ansible.builtin.shell:
+#    cmd: "/home/{{ main_user }}/.tmux/plugins/tpm/bin/install_plugins"
+#  become: true
