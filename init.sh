@@ -7,18 +7,15 @@ PKG_LIST=("git" "ansible")
 PKG_MANAGER=""
 
 function check_pkg_manager() {
-  for i in $1; do
-    echo "$i"
-    if ! which "$i"; then
-      echo " $i not in this system"
-    else
+  arr=("$@")
+  for i in "${arr[@]}"; do
+    if command -v "$i" >/dev/null 2>&1; then
       PKG_MANAGER=$i
     fi
   done
 }
 
 function install_packages () {
-  echo "---> $1"
   $1 update -y
   for i in "${PKG_LIST[@]}"; do
     $1 install -y "$i"
@@ -32,7 +29,7 @@ fi
 
 check_pkg_manager "${PKG_MANAGERS[@]}"
 
-if [[ -z "$PKG_MANAGER" ]]; then
+if [[ -n "$PKG_MANAGER" ]]; then
   install_packages "$PKG_MANAGER"
 else
   echo "PKG_MANAGER not defined"
