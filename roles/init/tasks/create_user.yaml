@@ -13,6 +13,11 @@
         sudo
       {% endif %}
 
+- name: Ensure group "{{ main_user }}" exists
+  ansible.builtin.group:
+    name: "{{ main_user }}"
+    state: present
+
 - name: Create user "{{ main_user }}"
   ansible.builtin.user:
     name: "{{ main_user }}"
