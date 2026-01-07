@@ -1,29 +1,40 @@
 #!/bin/bash
 set -euo pipefail
 
-PKG_MANAGER=""
-
+PKG_MANAGERS=("apt" "dnf")
 PKG_LIST=("git" "ansible")
 
-function install_packages ()
-{
-  PKG_MANAGER_PATH=$(which $1)
-  
-  $PKG_MANAGER_PATH update -y
-  
-  for i in "${PKG_LIST[@]}"; do
-    $PKG_MANAGER_PATH install -y $i
+PKG_MANAGER_PATH=""
+PKG_MANAGER=""
+
+function check_pkg_manager() {
+  for i in $1; do
+    PKG_MANAGER_PATH=$(which "$i")
+    if [[ -z "$PKG_MANAGER_PATH" ]]; then
+      PKG_MANAGER=$PKG_MANAGER_PATH;
+    fi
   done
 }
 
+function install_packages ()
+{
+  $1 update -y
+  for i in "${PKG_LIST[@]}"; do
+    $1 install -y "$i"
+  done
+}
 
-if [[ -f /etc/redhat-release ]]; then
-  PKG_MANAGER="dnf";
-  install_packages $PKG_MANAGER
-elif [[ -f /etc/debian_version ]]; then
-  PKG_MANAGER="apt";
-  install_packages $PKG_MANAGER
+# Disable repo fedora-cisco-openh264
+if [[ -f /etc/yum.repos.d/fedora-cisco-openh264.repo ]]; then
+  sed -i 's/enabled=1/enabled=0/g' /etc/yum.repos.d/fedora-cisco-openh264.repo
+fi
+
+check_pkg_manager "${PKG_MANAGERS[@]}"
+
+if [[ -z "$PKG_MANAGER" ]]; then
+  install_packages "$PKG_MANAGER"
 else
   echo "PKG_MANAGER not defined"
   exit 1
+fi
   
