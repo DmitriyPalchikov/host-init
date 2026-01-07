@@ -13,23 +13,23 @@
     dest: "/home/{{ main_user }}/.tmux/plugins/tpm"
   become: true
 
-- name: Install tmux plugins
-  ansible.builtin.shell: |
-    su - {{ main_user }} -c "
-      cd /home/{{ main_user }}/.tmux/plugins/tpm &&
-      ./bin/install_plugins
-    "
-  become: true
-  args:
-    executable: /bin/bash
-  ignore_errors: yes
-  register: command_result
+#- name: Install tmux plugins
+#  ansible.builtin.shell: |
+#    su - {{ main_user }} -c "
+#      cd /home/{{ main_user }}/.tmux/plugins/tpm &&
+#      ./bin/install_plugins
+#    "
+#  become: true
+#  args:
+#    executable: /bin/bash
+#  ignore_errors: yes
+#  register: command_result
 
 - name: Update tmux plugins
   ansible.builtin.shell: |
     su - {{ main_user }} -c "
       cd /home/{{ main_user }}/.tmux/plugins/tpm &&
-      ./bin/update_plugins
+      ./bin/update_plugins all
     "
   become: true
   args:
