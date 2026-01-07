@@ -1,7 +1,7 @@
 - name: Download Oh-my-zsh installer
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
-    dest: "/home/{{ main_user }}/.install-oh-my-zsh.sh"
+    dest: "/home/{{ main_user }}/install-oh-my-zsh.sh"
     mode: '0755'
     owner: "{{ main_user }}"
     group: "{{ main_user }}"
@@ -12,7 +12,7 @@
 - name: Install Oh-my-zsh (with verification)
   ansible.builtin.shell: |
     export ZSH="/home/{{ main_user }}/.oh-my-zsh"
-    bash "/home/{{ main_user }}/.install-oh-my-zsh.sh" --unattended
+    bash "/home/{{ main_user }}/install-oh-my-zsh.sh" --unattended
   args:
     executable: /bin/bash
     creates: "/home/{{ main_user }}/.oh-my-zsh"
