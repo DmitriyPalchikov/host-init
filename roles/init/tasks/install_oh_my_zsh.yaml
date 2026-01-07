@@ -28,6 +28,7 @@
   become: true
 
 - name: Settings Oh-My-ZSH
+  become: true
   block:
     - name: Clone repository fzf-zsh-plugin
       ansible.builtin.git:
@@ -42,7 +43,6 @@
         group: "{{ main_user }}"
         mode: "0755"
         state: directory
-      become: true
 
     - name: Touch file .fzf.zsh
       ansible.builtin.file:
@@ -51,7 +51,6 @@
         group: "{{ main_user }}"
         mode: "0644"
         state: touch
-      become: true
 
     - name: Clone repository zsh-autosuggestions
       ansible.builtin.git:
