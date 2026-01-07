@@ -24,6 +24,11 @@
     path: "/home/{{ main_user }}/install-oh-my-zsh.sh"
     state: absent
 
+- name: Remove Powerlevel10k dir
+  ansible.builtin.file:
+    path: "/home/{{ main_user }}/.oh-my-zsh/custom/themes/powerlevel10k"
+    state: absent
+
 - name: Clone Powerlevel10k
   ansible.builtin.git:
     repo: https://github.com/romkatv/powerlevel10k.git
