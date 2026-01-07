@@ -6,6 +6,7 @@
     owner: "{{ main_user }}"
     group: "{{ main_user }}"
   become_user: "{{ main_user }}"
+  become: true
   register: downloaded_script
   changed_when: downloaded_script.changed
 
