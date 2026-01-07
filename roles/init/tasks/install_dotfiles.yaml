@@ -10,21 +10,29 @@
       ansible.builtin.copy:
         src: /tmp/dotfiles/.zshrc
         dest: "/home/{{ main_user }}/.zshrc"
+        owner: "{{ main_user }}"
+        group: "{{ main_user }}"
 
     - name: Copy tmux conf file
       ansible.builtin.copy:
         src: /tmp/dotfiles/.tmux.conf
         dest: "/home/{{ main_user }}/.tmux.conf"
+        owner: "{{ main_user }}"
+        group: "{{ main_user }}"
 
     - name: Copy nvim conf files
       ansible.builtin.copy:
         src: /tmp/dotfiles/nvim/
         dest: "/home/{{ main_user }}/.config/nvim"
+        owner: "{{ main_user }}"
+        group: "{{ main_user }}"
 
     - name: Copy alacritty conf file
       ansible.builtin.copy:
         src: /tmp/dotfiles/alacritty/
         dest: "/home/{{ main_user }}/.config/alacritty"
+        owner: "{{ main_user }}"
+        group: "{{ main_user }}"
 
 - name: Delete dotfiles repo
   ansible.builtin.file:

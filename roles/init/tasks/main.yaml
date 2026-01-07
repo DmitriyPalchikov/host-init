@@ -27,3 +27,6 @@
   include_tasks: settings_tmux.yaml
   tags:
     - tmux
+
+- name: End of initialization
+  include_tasks:
