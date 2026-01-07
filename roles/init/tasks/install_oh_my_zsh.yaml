@@ -42,6 +42,7 @@
         group: "{{ main_user }}"
         mode: "0644"
         state: touch
+      become: true
 
     - name: Clone repository zsh-autosuggestions
       ansible.builtin.git:
