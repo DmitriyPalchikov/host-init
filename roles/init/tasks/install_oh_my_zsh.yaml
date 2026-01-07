@@ -1,29 +1,28 @@
 - name: Download Oh-my-zsh installer
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
-    dest: "{{ ansible_user_dir }}/.install-oh-my-zsh.sh"
+    dest: "/home/{{ main_user }}/.install-oh-my-zsh.sh"
     mode: '0755'
     owner: "{{ main_user }}"
     group: "{{ main_user }}"
   become_user: "{{ main_user }}"
-  become: true
   register: downloaded_script
   changed_when: downloaded_script.changed
 
 - name: Install Oh-my-zsh (with verification)
   ansible.builtin.shell: |
-    export ZSH="{{ ansible_user_dir }}/.oh-my-zsh"
-    bash "{{ ansible_user_dir }}/.install-oh-my-zsh.sh" --unattended
+    export ZSH="/home/{{ main_user }}/.oh-my-zsh"
+    bash "/home/{{ main_user }}/.install-oh-my-zsh.sh" --unattended
   args:
     executable: /bin/bash
-    creates: "{{ ansible_user_dir }}/.oh-my-zsh"
+    creates: "/home/{{ main_user }}/.oh-my-zsh"
   become_user: "{{ main_user }}"
   when: downloaded_script.changed
 
 - name: Clone Powerlevel10k
   ansible.builtin.git:
     repo: https://github.com/romkatv/powerlevel10k.git
-    dest: "{{ ansible_user_dir }}/.oh-my-zsh/custom/themes/powerlevel10k"
+    dest: "/home/{{ main_user }}/.oh-my-zsh/custom/themes/powerlevel10k"
     depth: 1
     update: true
   become_user: "{{ main_user }}"
@@ -38,7 +37,7 @@
 
     - name: Touch file .fzf.zsh
       ansible.builtin.file:
-        path: "{{ ansible_user_dir }}/.fzf/fzf.zsh"
+        path: "/home/{{ main_user }}/.fzf/fzf.zsh"
         owner: "{{ main_user }}"
         group: "{{ main_user }}"
         mode: "0644"
