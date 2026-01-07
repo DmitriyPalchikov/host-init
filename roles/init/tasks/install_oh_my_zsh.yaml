@@ -5,7 +5,7 @@
     mode: '0755'
     owner: "{{ main_user }}"
     group: "{{ main_user }}"
-  become_user: "{{ main_user }}"
+  become: true
   register: downloaded_script
   changed_when: downloaded_script.changed
 
@@ -16,7 +16,7 @@
   args:
     executable: /bin/bash
     creates: "/home/{{ main_user }}/.oh-my-zsh"
-  become_user: "{{ main_user }}"
+  become: true
   when: downloaded_script.changed
 
 - name: Clone Powerlevel10k
@@ -25,7 +25,7 @@
     dest: "/home/{{ main_user }}/.oh-my-zsh/custom/themes/powerlevel10k"
     depth: 1
     update: true
-  become_user: "{{ main_user }}"
+  become: true
 
 - name: Settings Oh-My-ZSH
   block:
