@@ -35,11 +35,16 @@
     executable: /bin/bash
   ignore_errors: yes
 
-- name: Change owner in tmux dir {{ main_user }}
+- name: Find files in .tmux
+  ansible.builtin.find:
+    paths: "/home/{{ main_user }}/.tmux"
+    file_type: any
+    recurse: yes
+  register: folder_contents_tmux
+
+- name: Change owner .tmux
   ansible.builtin.file:
-    path: "/home/{{ main_user }}/.tmux"
+    path: "{{ item.path }}"
     owner: "{{ main_user }}"
     group: "{{ main_user }}"
-    recurse: yes
-    state: directory
-  become: true
+  loop: "{{ folder_contents_tmux.files }}"
