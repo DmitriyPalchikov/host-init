@@ -29,5 +29,5 @@
 
 - name: Delete dotfiles repo
   ansible.builtin.file:
-    src: /tmp/dotfiles
+    path: /tmp/dotfiles
     state: absent

@@ -55,10 +55,10 @@
 
     - name: Remove eza.tar.gz
       ansible.builtin.file:
-        src: /tmp/eza.tar.gz
+        path: /tmp/eza.tar.gz
         state: absent
 
     - name: Remove eza
       ansible.builtin.file:
-        src: /tmp/eza
+        path: /tmp/eza
         state: absent
