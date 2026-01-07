@@ -11,7 +11,7 @@
   ansible.builtin.git:
     repo: https://github.com/tmux-plugins/tpm
     dest: "/home/{{ main_user }}/.tmux/plugins/tpm"
-  become_user: "{{ main_user }}"
+  become: true
 
 - name: Install tmux plugins
   ansible.builtin.shell: |
