@@ -1,0 +1,46 @@
+- name: Determine admin group based on OS family
+  ansible.builtin.set_fact:
+    admin_group: >-
+      {% if ansible_os_family == "RedHat" %}
+        wheel
+      {% elif ansible_os_family == "Debian" %}
+        sudo
+      {% elif ansible_os_family == "Suse" %}
+        wheel
+      {% elif ansible_os_family == "Archlinux" %}
+        wheel
+      {% else %}
+        sudo
+      {% endif %}
+
+- name: Create user "{{ main_user }}"
+  ansible.builtin.user:
+    name: "{{ main_user }}"
+    password: "{{ main_pass | password_hash('sha512') }}"
+    shell: /bin/zsh
+    groups: "{{ [main_user, admin_group] | join(',') }}"
+    create_home: yes
+    home: "/home/{{ main_user }}"
+    append: yes
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_type: rsa
+    ssh_key_file: .ssh/id_rsa
+    update_password: on_create
+  become: true
+
+- name: Check sudoers file
+  ansible.builtin.stat:
+    path: "/etc/sudoers.d/{{ main_user }}"
+  register: sudoers_file
+  become: true
+
+- name: Create sudoers file
+  ansible.builtin.lineinfile:
+    path: "/etc/sudoers.d/{{ main_user }}"
+    line: "{{ main_user }} ALL=(ALL:ALL) NOPASSWD: ALL"
+    insertafter: EOF
+    state: present
+    create: true
+  become: true
+  when: sudoers_file.stat.exists != true

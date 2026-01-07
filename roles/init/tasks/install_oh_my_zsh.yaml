@@ -1,0 +1,54 @@
+- name: Download Oh-my-zsh installer
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+    dest: "{{ ansible_user_dir }}/.install-oh-my-zsh.sh"
+    mode: '0755'
+    owner: "{{ main_user }}"
+    group: "{{ main_user }}"
+  become_user: "{{ main_user }}"
+  register: downloaded_script
+  changed_when: downloaded_script.changed
+
+- name: Install Oh-my-zsh (with verification)
+  ansible.builtin.shell: |
+    export ZSH="{{ ansible_user_dir }}/.oh-my-zsh"
+    bash "{{ ansible_user_dir }}/.install-oh-my-zsh.sh" --unattended
+  args:
+    executable: /bin/bash
+    creates: "{{ ansible_user_dir }}/.oh-my-zsh"
+  become_user: "{{ main_user }}"
+  when: downloaded_script.changed
+
+- name: Clone Powerlevel10k
+  ansible.builtin.git:
+    repo: https://github.com/romkatv/powerlevel10k.git
+    dest: "{{ ansible_user_dir }}/.oh-my-zsh/custom/themes/powerlevel10k"
+    depth: 1
+    update: true
+  become_user: "{{ main_user }}"
+
+- name: Settings Oh-My-ZSH
+  block:
+    - name: Clone repository fzf-zsh-plugin
+      ansible.builtin.git:
+        repo: https://github.com/unixorn/fzf-zsh-plugin.git
+        dest: ~/.oh-my-zsh/custom/plugins/fzf-zsh-plugin
+        depth: 1
+
+    - name: Touch file .fzf.zsh
+      ansible.builtin.file:
+        path: "{{ ansible_user_dir }}/.fzf/fzf.zsh"
+        owner: "{{ main_user }}"
+        group: "{{ main_user }}"
+        mode: "0644"
+        state: touch
+
+    - name: Clone repository zsh-autosuggestions
+      ansible.builtin.git:
+        repo: https://github.com/zsh-users/zsh-autosuggestions.git
+        dest: ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+
+    - name: Clone repository zsh-syntax-highlighting
+      ansible.builtin.git:
+        repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
+        dest: ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting

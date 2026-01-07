@@ -1,0 +1,33 @@
+- name: Check Nerd fonts in hosts
+  ansible.builtin.stat:
+    path: /usr/share/fonts/JetBrainsMono
+  register: fonts_stat
+
+- name: Fonts block
+  when: fonts_stat.stat.exists != true
+  become: true
+  block:
+    - name: Download Nerd fonts
+      ansible.builtin.get_url:
+        url: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.zip
+        dest: /tmp/JB.zip
+
+    - name: Remove dir JetBrainsMono
+      ansible.builtin.file:
+        path: /usr/share/fonts/JetBrainsMono
+        state: directory
+
+    - name: Unzip fonts
+      ansible.builtin.unarchive:
+        src: /tmp/JB.zip
+        dest: /usr/share/fonts/JetBrainsMono
+        remote_src: true
+
+    - name: Update cache fonts
+      ansible.builtin.shell:
+        cmd: fc-cache -f /usr/share/fonts
+
+    - name: Remove zip archive
+      ansible.builtin.file:
+        path: /tmp/JB.zip
+        state: absent
