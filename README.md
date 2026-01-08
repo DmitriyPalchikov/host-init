@@ -6,5 +6,7 @@
     ```
 2. Start ansible playbook:
     ```bash
+    ansible-galaxy collection install -r requirements.yml
+
     ansible-playbook ./playbook-init.yaml --extra-vars "main_pass=<some_password>" -K
     ```
