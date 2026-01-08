@@ -32,6 +32,7 @@
     - luarocks
     - lua
     - fzf
+    - go
   #    - kubectl
   become: true
 
