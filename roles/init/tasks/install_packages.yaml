@@ -35,6 +35,22 @@
   #    - kubectl
   become: true
 
+- name: Install flatpak for Fedora
+  ansible.builtin.package:
+    name:
+      - flatpak
+    state: present
+  become: true
+  when: ansible_facts["distribution"] == "Fedora"
+
+- name: Add Flathub repo
+  community.general.flatpak_remote:
+    name: flathub
+    state: present
+    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+    method: user
+  when: ansible_facts["distribution"] == "Fedora"
+
 - name: Install luacheck
   ansible.builtin.shell:
     cmd: luarocks install luacheck
