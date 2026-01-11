@@ -33,6 +33,8 @@
     - lua
     - fzf
     - go
+    - shellcheck
+    - pylint
   #    - kubectl
   become: true
 
