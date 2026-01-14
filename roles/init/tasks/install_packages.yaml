@@ -35,6 +35,7 @@
     - go
     - shellcheck
     - pylint
+    - batcat
   #    - kubectl
   become: true
 
