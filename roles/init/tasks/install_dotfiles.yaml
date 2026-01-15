@@ -37,8 +37,8 @@
 - name: Change alias in zshrc
   ansible.builtin.replace:
     path: "/home/{{ main_user }}/.zshrc"
-    regexp: "^alias cat="batcat""
-    replace: "alias cat="bat""
+    regexp: '^alias cat="batcat"'
+    replace: 'alias cat="bat"'
   when: ansible_facts["distribution"] == "Fedora"
 
 - name: Delete dotfiles repo
