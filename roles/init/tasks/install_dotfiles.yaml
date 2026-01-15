@@ -33,6 +33,8 @@
         dest: "/home/{{ main_user }}/.config/alacritty"
         owner: "{{ main_user }}"
         group: "{{ main_user }}"
+- name: Change alias in zshrc
+  
 
 - name: Delete dotfiles repo
   ansible.builtin.file:
