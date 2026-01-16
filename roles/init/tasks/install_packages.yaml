@@ -1,22 +1,37 @@
 ---
-- name: Disable repo for Fedora
-  ansible.builtin.dnf:
-    name: fedora-cisco-openh264
-    state: absent
-  become: true
+- name: Preparing Fedora
   when: ansible_distribution == "Fedora"
+  block:
+    - name: Disable repo for Fedora
+      ansible.builtin.dnf:
+        name: fedora-cisco-openh264
+        state: absent
+      become: true
 
-- name: Update repos DNF
-  ansible.builtin.dnf:
-    update_cache: true
-  become: true
-  when: ansible_os_family == "RedHat"
+    - name: Update repos DNF
+      ansible.builtin.dnf:
+        update_cache: true
+      become: true
+
+    - name: Install flatpak for Fedora
+      ansible.builtin.package:
+        name:
+          - flatpak
+        state: present
+      become: true
+
+    - name: Add Flathub repo
+      community.general.flatpak_remote:
+        name: flathub
+        state: present
+        flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+        method: user
 
 - name: Update repos APT
   ansible.builtin.apt:
     update_cache: true
   become: true
-  when: ansible_os_family == "Debian"
+  when: ansible_distribution == "Ubuntu"
 
 - name: Install full packages
   ansible.builtin.package:
@@ -39,22 +54,6 @@
     - bat
   #    - kubectl
   become: true
-
-- name: Install flatpak for Fedora
-  ansible.builtin.package:
-    name:
-      - flatpak
-    state: present
-  become: true
-  when: ansible_distribution == "Fedora"
-
-- name: Add Flathub repo
-  community.general.flatpak_remote:
-    name: flathub
-    state: present
-    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
-    method: user
-  when: ansible_distribution == "Fedora"
 
 - name: Install luacheck
   ansible.builtin.shell:
