@@ -6,12 +6,6 @@
   become: true
   when: ansible_distribution == "Fedora"
 
-- name: Install lazygit
-  community.general.copr:
-    name: dejan/lazygit
-  become: true
-  when: ansible_distribution == "Fedora"
-
 - name: Update repos DNF
   ansible.builtin.dnf:
     update_cache: true
@@ -50,7 +44,6 @@
   ansible.builtin.package:
     name:
       - flatpak
-      - lazygit
     state: present
   become: true
   when: ansible_distribution == "Fedora"
@@ -99,8 +92,7 @@
         path: /tmp/eza
         state: absent
 
-- name: Install lazygit on Ubuntu
-  when: ansible_distribution == 'Ubuntu'
+- name: Install lazygit
   block:
     - name: Get ugi info lazygit release
       ansible.builtin.uri:
@@ -130,6 +122,7 @@
         owner: root
         group: root
         mode: "0755"
+      become: true
 
     - name: Remove lazygit.tar.gz
       ansible.builtin.file:
