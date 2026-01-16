@@ -61,38 +61,7 @@
     cmd: luarocks install luacheck
   become: true
 
-- name: Install EZA
-  block:
-    - name: Clone a repo eza
-      ansible.builtin.get_url:
-        url: "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz"
-        dest: /tmp/eza.tar.gz
-
-    - name: Extract eza.tar.gz into /tmp
-      ansible.builtin.unarchive:
-        src: /tmp/eza.tar.gz
-        dest: /tmp
-
-    - name: Copy eza into /usr/local/bin/eza
-      ansible.builtin.copy:
-        src: /tmp/eza
-        dest: /usr/local/bin/eza
-        owner: root
-        group: root
-        mode: "0755"
-      become: true
-
-    - name: Remove eza.tar.gz
-      ansible.builtin.file:
-        path: /tmp/eza.tar.gz
-        state: absent
-
-    - name: Remove eza
-      ansible.builtin.file:
-        path: /tmp/eza
-        state: absent
-
-- name: Install lazygit
+- name: Install eza and lazygit
   block:
     - name: Get ugi info lazygit release
       ansible.builtin.uri:
@@ -100,36 +69,51 @@
         return_content: true
       register: lazygit_release
 
-    - name: Extract version number
+    - name: Extract version number lazygit
       ansible.builtin.set_fact:
         lazygit_version: "{{ lazygit_release.json.tag_name | regex_replace('^v', '') }}"
 
-    - name: Download lazygit.tar.gz
+    - name: Clone a repos
       ansible.builtin.get_url:
-        url: "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
-        dest: /tmp/lazygit.tar.gz
-        mode: "0440"
+        url: "{{ item.url }}"
+        dest: "{{ item.path }}"
+      loop:
+        - {
+            url: "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz",
+            path: "/tmp/eza.tar.gz",
+          }
+        - {
+            url: "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz",
+            path: "/tmp/lazygit.tar.gz",
+          }
 
-    - name: Extract lazygit.tar.gz into /tmp
+    - name: Extract tar.gz files into /tmp
       ansible.builtin.unarchive:
-        src: /tmp/lazygit.tar.gz
+        src: "/tmp/{{ item }}"
         dest: /tmp
+      loop:
+        - "eza.tar.gz"
+        - "lazygit.tar.gz"
 
-    - name: Copy lazygit into /usr/local/bin/lazygit
+    - name: Copy files into /usr/local/bin/
       ansible.builtin.copy:
-        src: /tmp/lazygit
-        dest: /usr/local/bin/lazygit
+        src: "/tmp/{{ item }}"
+        dest: "/usr/local/bin/{{ item }}"
         owner: root
         group: root
         mode: "0755"
       become: true
+      loop:
+        - "eza"
+        - "lazygit"
 
-    - name: Remove lazygit.tar.gz
+    - name: Remove archive files
       ansible.builtin.file:
-        path: /tmp/lazygit.tar.gz
+        path: "/tmp/{{ item }}"
         state: absent
-
-    - name: Remove lazygit
-      ansible.builtin.file:
-        path: /tmp/lazygit
-        state: absent
+      become: true
+      loop:
+        - eza.tar.gz
+        - lazygit.tar.gz
+        - eza
+        - lazygit
