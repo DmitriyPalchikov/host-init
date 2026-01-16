@@ -1,19 +1,26 @@
+---
 - name: Disable repo for Fedora
   ansible.builtin.dnf:
     name: fedora-cisco-openh264
     state: absent
   become: true
-  when: ansible_facts["distribution"] == "Fedora"
+  when: ansible_distribution == "Fedora"
+
+- name: Install lazygit
+  community.general.copr:
+    name: dejan/lazygit
+  become: true
+  when: ansible_distribution == "Fedora"
 
 - name: Update repos DNF
   ansible.builtin.dnf:
-    update_cache: yes
+    update_cache: true
   become: true
   when: ansible_os_family == "RedHat"
 
 - name: Update repos APT
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
   become: true
   when: ansible_os_family == "Debian"
 
@@ -30,9 +37,9 @@
     - zsh
     - python3-passlib
     - luarocks
-    - lua
+    - "{{ 'lua5.4' if ansible_distribution == 'Ubuntu' else 'lua' }}"
     - fzf
-    - go
+    - "{{ 'golang-go' if ansible_distribution == 'Ubuntu' else 'go' }}"
     - shellcheck
     - pylint
     - bat
@@ -43,9 +50,10 @@
   ansible.builtin.package:
     name:
       - flatpak
+      - lazygit
     state: present
   become: true
-  when: ansible_facts["distribution"] == "Fedora"
+  when: ansible_distribution == "Fedora"
 
 - name: Add Flathub repo
   community.general.flatpak_remote:
@@ -53,7 +61,7 @@
     state: present
     flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
     method: user
-  when: ansible_facts["distribution"] == "Fedora"
+  when: ansible_distribution == "Fedora"
 
 - name: Install luacheck
   ansible.builtin.shell:
@@ -89,4 +97,46 @@
     - name: Remove eza
       ansible.builtin.file:
         path: /tmp/eza
+        state: absent
+
+- name: Install lazygit on Ubuntu
+  when: ansible_distribution == 'Ubuntu'
+  block:
+    - name: Get ugi info lazygit release
+      ansible.builtin.uri:
+        url: https://api.github.com/repos/jesseduffield/lazygit/releases/latest
+        return_content: true
+      register: lazygit_release
+
+    - name: Extract version number
+      ansible.builtin.set_fact:
+        lazygit_version: "{{ lazygit_release.json.tag_name | regex_replace('^v', '') }}"
+
+    - name: Download foo.conf
+      ansible.builtin.get_url:
+        url: "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
+        dest: /tmp/lazygit.tar.gz
+        mode: "0440"
+
+    - name: Extract lazygit.tar.gz into /tmp
+      ansible.builtin.unarchive:
+        src: /tmp/lazygit.tar.gz
+        dest: /tmp
+
+    - name: Copy lazygit into /usr/local/bin/lazygit
+      ansible.builtin.copy:
+        src: /tmp/lazygit
+        dest: /usr/local/bin/lazygit
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Remove lazygit.tar.gz
+      ansible.builtin.file:
+        path: /tmp/lazygit.tar.gz
+        state: absent
+
+    - name: Remove lazygit
+      ansible.builtin.file:
+        path: /tmp/lazygit
         state: absent
