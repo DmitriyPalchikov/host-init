@@ -55,6 +55,11 @@
   #    - kubectl
   become: true
 
+- name: Install debugger for golang
+  ansible.builtin.shell:
+    cmd: go install github.com/go-delve/delve/cmd/dlv@latest
+  become: true
+
 - name: Install luacheck
   ansible.builtin.shell:
     cmd: luarocks install luacheck

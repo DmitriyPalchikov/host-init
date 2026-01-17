@@ -45,3 +45,4 @@
   ansible.builtin.file:
     path: /tmp/dotfiles
     state: absent
+  become: true
