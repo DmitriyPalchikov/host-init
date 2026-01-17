@@ -47,7 +47,6 @@
     - python3-passlib
     - luarocks
     - "{{ 'lua5.4' if ansible_distribution == 'Ubuntu' else 'lua' }}"
-    - fzf
     - "{{ 'golang-go' if ansible_distribution == 'Ubuntu' else 'go' }}"
     - shellcheck
     - pylint
