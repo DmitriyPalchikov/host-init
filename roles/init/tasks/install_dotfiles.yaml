@@ -1,3 +1,4 @@
+---
 - name: Clone a repo with dotfiles
   ansible.builtin.git:
     repo: "https://github.com/DmitriyPalchikov/dotfiles.git"
@@ -6,33 +7,33 @@
 - name: Copy dotfiles
   become: true
   block:
-    - name: Copy zshrc file
+    - name: Copy config files into .config
       ansible.builtin.copy:
-        src: /tmp/dotfiles/.zshrc
-        dest: "/home/{{ main_user }}/.zshrc"
+        src: "/tmp/dotfiles/.config/{{ item }}"
+        dest: "/home/{{ main_user }}/.config/"
         owner: "{{ main_user }}"
         group: "{{ main_user }}"
+        mode: "0755"
+      loop:
+        - nvim
+        - alacritty
+        - k9s
 
-    - name: Copy tmux conf file
+    - name: Copy config files into .config
       ansible.builtin.copy:
-        src: /tmp/dotfiles/.tmux.conf
-        dest: "/home/{{ main_user }}/.tmux.conf"
+        src: "/tmp/dotfiles/{{ item }}"
+        dest: "/home/{{ main_user }}/{{ item }}"
         owner: "{{ main_user }}"
         group: "{{ main_user }}"
+        mode: "0644"
+      loop:
+        - .zshrc
+        - .tmux.conf
 
-    - name: Copy nvim conf files
-      ansible.builtin.copy:
-        src: /tmp/dotfiles/nvim/
-        dest: "/home/{{ main_user }}/.config/nvim"
-        owner: "{{ main_user }}"
-        group: "{{ main_user }}"
-
-    - name: Copy alacritty conf file
-      ansible.builtin.copy:
-        src: /tmp/dotfiles/alacritty/
-        dest: "/home/{{ main_user }}/.config/alacritty"
-        owner: "{{ main_user }}"
-        group: "{{ main_user }}"
+    - name: Delete dotfiles repo
+      ansible.builtin.file:
+        path: /tmp/dotfiles
+        state: absent
 
 - name: Change alias in zshrc
   ansible.builtin.replace:
@@ -41,8 +42,3 @@
     replace: 'alias cat="bat"'
   when: ansible_facts["distribution"] == "Fedora"
 
-- name: Delete dotfiles repo
-  ansible.builtin.file:
-    path: /tmp/dotfiles
-    state: absent
-  become: true

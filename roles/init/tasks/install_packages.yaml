@@ -13,12 +13,15 @@
         update_cache: true
       become: true
 
-    - name: Install flatpak for Fedora
+    - name: Install packages for Fedora
       ansible.builtin.package:
         name:
-          - flatpak
+          - "{{ item }}"
         state: present
       become: true
+      loop:
+        - flatpak
+        - k9s
 
     - name: Add Flathub repo
       community.general.flatpak_remote:
@@ -54,6 +57,13 @@
   #    - kubectl
   become: true
 
+- name: Install k9s for Ubuntu
+  ansible.builtin.apt:
+    deb: https://github.com/derailed/k9s/releases/latest/download/k9s_linux_amd64.deb
+  become: true
+  when: ansible_distribution == "Ubuntu"
+  changed_when: true
+
 - name: Install debugger for golang
   ansible.builtin.shell:
     cmd: go install github.com/go-delve/delve/cmd/dlv@latest
@@ -66,7 +76,7 @@
 
 - name: Install eza and lazygit
   block:
-    - name: Get ugi info lazygit release
+    - name: Get uri info lazygit release
       ansible.builtin.uri:
         url: https://api.github.com/repos/jesseduffield/lazygit/releases/latest
         return_content: true
@@ -120,3 +130,10 @@
         - lazygit.tar.gz
         - eza
         - lazygit
+
+- name: Install minikube
+  ansible.builtin.get_url:
+    url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    dest: /usr/local/bin/minikube
+    mode: '0755'
+  become: true
