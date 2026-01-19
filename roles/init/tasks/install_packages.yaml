@@ -54,6 +54,8 @@
     - shellcheck
     - pylint
     - bat
+    - cargo
+    - rustup
   #    - kubectl
   become: true
 
