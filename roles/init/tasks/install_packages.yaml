@@ -30,11 +30,107 @@
         flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
         method: user
 
-- name: Update repos APT
-  ansible.builtin.apt:
-    update_cache: true
-  become: true
+    - name: Install multiple Flathub packages
+      community.general.flatpak:
+        name:
+          - com.github.johnfactotum.Foliate
+          - rest.insomnia.Insomnia
+          - org.remmina.Remmina
+          - com.bitwarden.desktop
+          - com.jgraph.drawio.desktop
+          - be.alexandervanhee.gradia
+          - dev.k8slens.OpenLens
+          - com.obsproject.Studio
+          - md.obsidian.Obsidian
+          - org.wireshark.Wireshark
+          - io.github.troyeguo.koodo-reader
+          - org.telegram.desktop
+          - com.jetbrains.GoLand
+          - io.github.diegopvlk.Tomatillo
+          - io.github.shonebinu.Brief
+
+
+    - name: Get key SourceGit
+      ansible.builtin.uri:
+        url: https://codeberg.org/api/packages/yataro/rpm.repo
+        return_content: true
+      register: repo_info
+
+    - name: Copy key SourceGit
+      ansible.builtin.copy:
+        content: "{{ repo_info.content }}"
+        dest: /etc/yum.repos.d/sourcegit.repo
+
+    - name: Change alias in SourceGit file
+      ansible.builtin.replace:
+        path: "/etc/yum.repos.d/sourcegit.repo"
+        regexp: 'gpgcheck=1'
+        replace: 'gpgcheck=0'
+
+    - name: Add repository from file SourceGit
+      community.general.dnf_config_manager:
+        name: sourcegit
+        state: present
+
+    - name: Install Yandex Browser
+      ansible.builtin.get_url:
+        url: https://browser.yandex.ru/download?os=linux&package=rpm&x64=1
+        dest: /tmp/yandex.rpm
+
+    - name: Install Yandex for Fedora
+      ansible.builtin.apt:
+        deb: /tmp/yandex.rpm
+      become: true
+      changed_when: true
+
+- name: Preparing Ubuntu
   when: ansible_distribution == "Ubuntu"
+  block:
+    - name: Update repos APT
+      ansible.builtin.apt:
+        update_cache: true
+      become: true
+
+    - name: Install k9s for Ubuntu
+      ansible.builtin.apt:
+        deb: https://github.com/derailed/k9s/releases/latest/download/k9s_linux_amd64.deb
+      become: true
+      changed_when: true
+
+    - name: Create /etc/apt/keyrings
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+      become: true
+
+    - name: Get key SourceGit
+      ansible.builtin.uri:
+        url: https://codeberg.org/api/packages/yataro/debian/repository.key
+        return_content: true
+      register: source_key
+
+    - name: Copy key SourceGit
+      ansible.builtin.copy:
+        content: "{{ source_key.content }}"
+        dest: /etc/apt/keyrings/sourcegit.asc
+
+    - name: Add SourceGit repository
+      ansible.builtin.apt_repository:
+        repo: deb [signed-by=/etc/apt/keyrings/sourcegit.asc, arch=amd64,arm64] https://codeberg.org/api/packages/yataro/debian generic main
+        state: present
+        filename: sourcegit.list
+
+    - name: Install Yandex Browser
+      ansible.builtin.get_url:
+        url: https://browser.yandex.ru/download?os=linux&package=deb&x64=1
+        dest: /tmp/yandex.deb
+
+    - name: Install Yandex for Ubuntu
+      ansible.builtin.apt:
+        deb: /tmp/yandex.deb
+      become: true
+      changed_when: true
 
 - name: Install full packages
   ansible.builtin.package:
@@ -56,15 +152,9 @@
     - bat
     - cargo
     - rustup
+    - sourcegit
   #    - kubectl
   become: true
-
-- name: Install k9s for Ubuntu
-  ansible.builtin.apt:
-    deb: https://github.com/derailed/k9s/releases/latest/download/k9s_linux_amd64.deb
-  become: true
-  when: ansible_distribution == "Ubuntu"
-  changed_when: true
 
 - name: Install debugger for golang
   ansible.builtin.shell:
@@ -139,3 +229,19 @@
     dest: /usr/local/bin/minikube
     mode: '0755'
   become: true
+
+- name: Install ZED
+  block:
+    - name: Get script Zed
+      ansible.builtin.uri:
+        url: https://zed.dev/install.sh
+        return_content: true
+      register: zed_scripts
+
+    - name: Copy script Zed
+      ansible.builtin.copy:
+        content: "{{ zed_scripts.content }}"
+        dest: /tmp/install.sh
+
+    - name: Run a script install.sh for Zed
+      ansible.builtin.script: /tmp/install.sh

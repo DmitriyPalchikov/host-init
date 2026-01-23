@@ -50,3 +50,8 @@
     create: true
   become: true
   when: sudoers_file.stat.exists != true
+
+- name: Set timezone to Europe/Moscow
+  become: true
+  community.general.timezone:
+    name: Europe/Moscow
