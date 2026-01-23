@@ -50,38 +50,41 @@
           - io.github.shonebinu.Brief
 
 
-    - name: Get key SourceGit
+    - name: Get SourceGit file
       ansible.builtin.uri:
         url: https://codeberg.org/api/packages/yataro/rpm.repo
         return_content: true
       register: repo_info
 
-    - name: Copy key SourceGit
+    - name: Copy SourceGit file
       ansible.builtin.copy:
         content: "{{ repo_info.content }}"
         dest: /etc/yum.repos.d/sourcegit.repo
+      become: true
 
     - name: Change alias in SourceGit file
       ansible.builtin.replace:
         path: "/etc/yum.repos.d/sourcegit.repo"
         regexp: 'gpgcheck=1'
         replace: 'gpgcheck=0'
+      become: true
 
-    - name: Add repository from file SourceGit
-      community.general.dnf_config_manager:
-        name: sourcegit
-        state: present
-
-    - name: Install Yandex Browser
-      ansible.builtin.get_url:
-        url: https://browser.yandex.ru/download?os=linux&package=rpm&x64=1
-        dest: /tmp/yandex.rpm
-
-    - name: Install Yandex for Fedora
-      ansible.builtin.apt:
-        deb: /tmp/yandex.rpm
+    - name: Add SourceGit repository (Fedora 41+)
+      ansible.builtin.command:
+        cmd: dnf config-manager addrepo --from-repofile=/etc/yum.repos.d/sourcegit.repo --overwrite
       become: true
       changed_when: true
+
+    # - name: Download yandex rpm package
+    #   ansible.builtin.get_url:
+    #     url: https://repo.yandex.ru/yandex-browser/rpm/stable/x86_64/yandex-browser-stable-25.12.1.1217-1.x86_64.rpm
+    #     dest: /tmp/yandex.rpm
+    #
+    # - name: Install Yandex Browser
+    #   ansible.builtin.dnf:
+    #     name: /tmp/yandex.rpm
+    #     state: present
+    #   become: true
 
 - name: Preparing Ubuntu
   when: ansible_distribution == "Ubuntu"
