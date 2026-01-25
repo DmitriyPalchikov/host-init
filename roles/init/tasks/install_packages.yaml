@@ -32,6 +32,7 @@
 
     - name: Install multiple Flathub packages
       community.general.flatpak:
+        method: user
         name:
           - com.github.johnfactotum.Foliate
           - rest.insomnia.Insomnia
