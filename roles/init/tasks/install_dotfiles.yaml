@@ -19,7 +19,7 @@
         - alacritty
         - k9s
 
-    - name: Copy config files into .config
+    - name: Copy config files
       ansible.builtin.copy:
         src: "/tmp/dotfiles/{{ item }}"
         dest: "/home/{{ main_user }}/{{ item }}"
