@@ -165,10 +165,16 @@
     cmd: go install github.com/go-delve/delve/cmd/dlv@latest
   become: true
 
+- name: Check luacheck in host
+  ansible.builtin.stat:
+    path: /usr/bin/luacheck
+  register: luacheck_file
+
 - name: Install luacheck
   ansible.builtin.shell:
     cmd: luarocks install luacheck
   become: true
+  when: not luacheck_file.stat.exists
 
 - name: Install eza and lazygit
   block:
@@ -234,7 +240,13 @@
     mode: '0755'
   become: true
 
+- name: Check ZED in host
+  ansible.builtin.stat:
+    path: "/home/{{ main_user }}/.local/bin/zed"
+  register: zed_file
+
 - name: Install ZED
+  when: not zed_file.stat.exists
   block:
     - name: Get script Zed
       ansible.builtin.uri:

@@ -56,13 +56,14 @@
         mode: "0755"
         state: directory
 
-    - name: Touch file .fzf.zsh
-      ansible.builtin.file:
-        path: "/home/{{ main_user }}/.fzf/fzf.zsh"
-        owner: "{{ main_user }}"
-        group: "{{ main_user }}"
-        mode: "0644"
-        state: touch
+    - name: Clone fzf
+      ansible.builtin.git:
+        repo: https://github.com/junegunn/fzf.git
+        dest: "/home/{{ main_user }}/.fzf"
+
+    - name: Start install fzf
+      ansible.builtin.shell:
+        cmd: "/home/{{ main_user }}/.fzf/install"
 
     - name: Clone repository zsh-autosuggestions
       ansible.builtin.git:
