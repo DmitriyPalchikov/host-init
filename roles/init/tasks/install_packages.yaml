@@ -22,6 +22,9 @@
       loop:
         - flatpak
         - k9s
+        - openssl-devel
+        - pkgconf-pkg-config 
+        - gcc
 
     - name: Add Flathub repo
       community.general.flatpak_remote:
