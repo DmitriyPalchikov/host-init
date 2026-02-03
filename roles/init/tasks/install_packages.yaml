@@ -23,7 +23,7 @@
         - flatpak
         - k9s
         - openssl-devel
-        - pkgconf-pkg-config 
+        - pkgconf-pkg-config
         - gcc
 
     - name: Add Flathub repo
@@ -78,17 +78,6 @@
         cmd: dnf config-manager addrepo --from-repofile=/etc/yum.repos.d/sourcegit.repo --overwrite
       become: true
       changed_when: true
-
-    # - name: Download yandex rpm package
-    #   ansible.builtin.get_url:
-    #     url: https://repo.yandex.ru/yandex-browser/rpm/stable/x86_64/yandex-browser-stable-25.12.1.1217-1.x86_64.rpm
-    #     dest: /tmp/yandex.rpm
-    #
-    # - name: Install Yandex Browser
-    #   ansible.builtin.dnf:
-    #     name: /tmp/yandex.rpm
-    #     state: present
-    #   become: true
 
 - name: Preparing Ubuntu
   when: ansible_distribution == "Ubuntu"
@@ -160,6 +149,7 @@
     - cargo
     - rustup
     - sourcegit
+    - ripgrep
   #    - kubectl
   become: true
 
